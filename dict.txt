@@ -22,6 +22,10 @@
 	
 扩展
 import hashlib  密码加密
+
+算法加盐
+将给入的密码与指定字符串拼接在进行加密
+
 hash = hashlib.md5() 生成对象
 hash.update(pwd.encode()) 加密处理
 pwd = hash/hexdigest() 提取加密后密码
