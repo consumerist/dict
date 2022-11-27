@@ -1,0 +1,32 @@
+在线字典
+
+1.确定好技术方案 （套接字，并发，细节确定）
+	* tcp 套接字 
+	* 多进程并发
+	* 历史记录：查看前十条查询单词 
+	* 注册成功 ：直接登录
+2.数据表进行建立
+	* 用户表 user  -> id  account  password      create table user(id int primary key auto_increment,name varchar(32) not null,password varchar(32) not null);
+	* 历史表 history -> id word 
+	 create table history(id int primary key auto_increment,word varchar(32) not null,word_explain varchar(32) not null,search_time 
+	 datetime);
+3.功能分析 和通信搭建
+	并发通信
+	登录
+	注册成功查单词
+	历史记录
+4.功能模块划分
+	*网络搭建
+	*
+	
+	
+扩展
+import hashlib  密码加密
+hash = hashlib.md5() 生成对象
+hash.update(pwd.encode()) 加密处理
+pwd = hash/hexdigest() 提取加密后密码
+print(pwd)
+import getpass  隐藏输入
+#输入隐藏
+pwd = getpass.getpass()
+cmd输入时不显示
