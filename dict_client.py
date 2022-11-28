@@ -31,18 +31,34 @@ def add_account(s):
             print("两次密码不一样")
             continue
         break
-    password = lock.lock(password,name)
-    s.send(("A "+name+" "+password).encode())
+    password = lock.lock(password, name)
+    s.send(("A " + name + " " + password).encode())
     msg = s.recv(1024).decode()
     if msg == "OK":
         print("注册成功")
     else:
         print(msg.decode())
         print("注册失败")
+
+
 def log(s):
-    pass
+    while True:
+        name = input("user:")
+        password = input("Password")
+        s.send(("L " + name + " " + password).encode())
+        date = s.recv(1024).decode()
+        if date == "OK":
+            print("登陆成功")
+            search_word(s)
+        else:
+            print("账号或密码错误,请重新输入")
+            continue
 
-
+def search_word(s):
+    cmd = input("==============\n"
+                "请输入查询单词：\n"
+                "==============\n"
+                ">>")
 def main():
     # 搭建tcp网络模型
     s = socket()
@@ -57,6 +73,8 @@ def main():
         elif cmd == '2':
             log(s)
         elif cmd == '3':
+            s.send("Q")
+            s.close()
             break
 
 

@@ -8,38 +8,53 @@ import sys
 from socket import *
 from multiprocessing import *
 from signal import *
-import operation
+
+import lock
+from operation import *
 
 # 全局变量
 ADDR = "127.0.0.1"
 PORT = 8888
 ADDRESS = (PORT, ADDR)
+db = Database("dict")
+db.Connect()
+db.Cursor()
 
 
-def add_account(cmd,config):
+def add_account(cmd, config):
     name = cmd[1]
     password = cmd[2]
-    result = operation.Serach(name,password)
-    print(result)
-    if result:
-        config.send('OK'.encode())
+    # 返回值True则注册成功
+    if db.Search(name, password):
+        config.send(b"OK")
     else:
         config.send("用户名已存在".encode())
+
+
+def log(cmd, config):
+    name = cmd[1]
+    password = cmd[2]
+    password = lock.lock(password,name)
+    result = db.log(name,password)
+    if result:
+        config.send(b"OK")
+    else:
+        config.send("账号或密码错误")
 
 # 接收客户端请求，分配处理函数
 def request(config):
     while True:
         date = config.recv(1024)
         cmd = date.decode().split(" ")
-        print(cmd)
-        print(cmd[0])
-        if date[0] == 'A':
-            add_account(cmd,config)
-        elif date[0] == "L":
-            pass
-        elif date[0] == "Q":
+        if not date or cmd[0] == "Q":
             config.close()
             break
+        elif cmd[0] == 'A':
+            add_account(cmd, config)
+        elif cmd[0] == "L":
+            log(cmd, config)
+
+
 
 def main():
     s = socket()
@@ -53,6 +68,7 @@ def main():
             config, addr = s.accept()
             print("come from ", addr)
         except KeyboardInterrupt:
+            db.close()
             s.close()
             sys.exit("服务器退出")
         except Exception as e:
@@ -65,7 +81,7 @@ def main():
         p.start()
         p.join()
 
+
 # 搭建tcp网络模型
 if __name__ == "__main__":
     main()
-
