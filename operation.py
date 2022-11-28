@@ -63,5 +63,10 @@ class Database:
             return True
         else:
             return False
+
+    def Search_word(self,word):
+        sql = "select * from words where word = %s or interpretation = %s"
+        self.cur.execute(sql,[word,word])
+        return self.cur.fetchone()
     def close(self):
         self.db.close()

@@ -34,12 +34,22 @@ def add_account(cmd, config):
 def log(cmd, config):
     name = cmd[1]
     password = cmd[2]
-    password = lock.lock(password,name)
-    result = db.log(name,password)
+    password = lock.lock(password, name)
+    result = db.log(name, password)
     if result:
         config.send(b"OK")
     else:
         config.send("账号或密码错误")
+
+
+def search_word(cmd, config):
+    word = cmd[1]
+    word_list = " ".join(db.Search_word(word))
+    if word_list:
+        config.send(word_list.encode())
+    else:
+        config.send("该单词不存在".encode())
+
 
 # 接收客户端请求，分配处理函数
 def request(config):
@@ -53,7 +63,8 @@ def request(config):
             add_account(cmd, config)
         elif cmd[0] == "L":
             log(cmd, config)
-
+        elif cmd[0] == "S":
+            search_word(cmd, config)
 
 
 def main():
