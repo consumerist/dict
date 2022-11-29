@@ -44,29 +44,29 @@ def add_account(s):
 def log(s):
     while True:
         name = input("user:")
-        password = input("Password")
+        password = getpass.getpass()
         s.send(("L " + name + " " + password).encode())
         date = s.recv(1024).decode()
         if date == "OK":
             print("登陆成功")
             index(s)
-            return
+            break
         else:
             print("账号或密码错误,请重新输入")
             continue
 
 def index(s):
-    cmd = input("=======Query=======\n"
-                "1.查单词 2.历史记录 3注销\n"
-                "===================\n"
-                "请输入操作命令:")
-    if cmd == "1":
-        search_word(s)
-    elif cmd == "2":
-        history(s)
-    elif cmd == "3":
-        return
-
+    while True:
+        cmd = input("=======Query=======\n"
+                    "1.查单词 2.历史记录 3注销\n"
+                    "===================\n"
+                    "请输入操作命令:")
+        if cmd == "1":
+            search_word(s)
+        elif cmd == "2":
+            history(s)
+        elif cmd == "3":
+            break
 def search_word(s):
     word = input("请输入查询单词/翻译:")
     s.send(("S " + word).encode())
@@ -74,7 +74,9 @@ def search_word(s):
     print(date.decode())
 
 def history(s):
-    pass
+    s.send(b"H")
+    date = s.recv(1024)
+    print(date.decode())
 def main():
     # 搭建tcp网络模型
     s = socket()

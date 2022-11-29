@@ -6,6 +6,7 @@ operation.py
 什么方法直接调用
 """
 import pymysql
+import datetime
 
 
 class Database:
@@ -64,9 +65,18 @@ class Database:
         else:
             return False
 
-    def Search_word(self,word):
+    def Search_word(self, word):
         sql = "select * from words where word = %s or interpretation = %s"
-        self.cur.execute(sql,[word,word])
+        self.cur.execute(sql, [word, word])
         return self.cur.fetchone()
+
+    def Add_History(self, word, explain, time):
+        sql = "insert into history (word,word_explain,search_time) value (%s,%s,%s)"
+        self.cur.execute(sql, [word, explain, time])
+        self.db.commit()
+    def show_history(self):
+        sql = "select word,word_explain,search_time from history limit 10 "
+        self.cur.execute(sql)
+        return self.cur.fetchall()
     def close(self):
         self.db.close()

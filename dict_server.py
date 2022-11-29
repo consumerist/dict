@@ -4,6 +4,7 @@ confiding:utf-8
 电子字典客户端
 模型：多进程 tcp并发
 """
+import datetime
 import sys
 from socket import *
 from multiprocessing import *
@@ -39,16 +40,29 @@ def log(cmd, config):
     if result:
         config.send(b"OK")
     else:
-        config.send("账号或密码错误")
+        config.send("账号或密码错误".encode())
 
 
 def search_word(cmd, config):
     word = cmd[1]
-    word_list = " ".join(db.Search_word(word))
-    if word_list:
+    if db.Search_word(word):
+        word_list = " ".join(db.Search_word(word))
+        word_H = word_list.partition(" ")
+        db.Add_History(word_H[0], word_H[2], datetime.datetime.now())
         config.send(word_list.encode())
     else:
         config.send("该单词不存在".encode())
+
+
+def History(config):
+    ls = db.show_history()
+    print(ls)
+    result = ""
+    for i in ls:
+        # 使用元组推导式将元素全部转换为字符类型，在使用join将元组转换为字符串
+        word_list = " ".join('%s' % id for id in i)
+        result += (word_list + "\n")
+    config.send(result.encode())
 
 
 # 接收客户端请求，分配处理函数
@@ -65,6 +79,8 @@ def request(config):
             log(cmd, config)
         elif cmd[0] == "S":
             search_word(cmd, config)
+        elif cmd[0] == "H":
+            History(config)
 
 
 def main():
